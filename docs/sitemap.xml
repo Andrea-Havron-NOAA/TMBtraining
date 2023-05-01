@@ -4,10 +4,19 @@
     <loc>https://nmfs-fish-tools.github.io/pkgdownTemplate/404.html</loc>
   </url>
   <url>
-    <loc>https://nmfs-fish-tools.github.io/pkgdownTemplate/LICENSE-text.html</loc>
+    <loc>https://nmfs-fish-tools.github.io/pkgdownTemplate/articles/000_Getting_Started_Contents.html</loc>
   </url>
   <url>
-    <loc>https://nmfs-fish-tools.github.io/pkgdownTemplate/Page.html</loc>
+    <loc>https://nmfs-fish-tools.github.io/pkgdownTemplate/articles/001_Beginner_TMB_Contents.html</loc>
+  </url>
+  <url>
+    <loc>https://nmfs-fish-tools.github.io/pkgdownTemplate/articles/00_00_TMB_Developer_Resources.html</loc>
+  </url>
+  <url>
+    <loc>https://nmfs-fish-tools.github.io/pkgdownTemplate/articles/00_01_Getting_Started.html</loc>
+  </url>
+  <url>
+    <loc>https://nmfs-fish-tools.github.io/pkgdownTemplate/articles/01_02_Likelihood_Review.html</loc>
   </url>
   <url>
     <loc>https://nmfs-fish-tools.github.io/pkgdownTemplate/articles/index.html</loc>
@@ -22,7 +31,13 @@
     <loc>https://nmfs-fish-tools.github.io/pkgdownTemplate/index.html</loc>
   </url>
   <url>
+    <loc>https://nmfs-fish-tools.github.io/pkgdownTemplate/LICENSE-text.html</loc>
+  </url>
+  <url>
     <loc>https://nmfs-fish-tools.github.io/pkgdownTemplate/news/index.html</loc>
+  </url>
+  <url>
+    <loc>https://nmfs-fish-tools.github.io/pkgdownTemplate/Page.html</loc>
   </url>
   <url>
     <loc>https://nmfs-fish-tools.github.io/pkgdownTemplate/reference/index.html</loc>

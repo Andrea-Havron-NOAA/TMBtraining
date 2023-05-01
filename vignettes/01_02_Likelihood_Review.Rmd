@@ -1,0 +1,167 @@
+---
+title:  "A review of statistical computing with TMB"
+author: "Andrea Havron<br>NOAA Fisheries, OST"
+output: html_document
+runtime: shiny
+---
+layout: true
+
+.footnote[U.S. Department of Commerce | National Oceanic and Atmospheric Administration | National Marine Fisheries Service]
+
+
+<style type="text/css">
+
+code.cpp{
+  font-size: 14px;
+}
+code.r{
+  font-size: 14px;
+}
+
+
+</style>
+
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(mvtnorm)
+library(plotly)
+#remotes::install_github("AckerDWM/gg3D")
+library(gg3D)
+```
+
+# ML Inference
+
+What is the likelihood of getting heads 30 times in 100 coin flips?
+
+
+1. Specify the model <br><br>
+$y ~ \sim Binomial(n, p)$
+
+
+2. Calculate the likelihood<br><br>
+$L(p; n, y) = \frac{n!}{y!(n-y)!}p^y(1-p)^{n-y}$
+
+
+$L(p; n = 100, y = 30)$
+```{r, eval=TRUE, out.width = '80%', echo = FALSE}
+curve(dbinom(30,100,x),0,0.75, ylab = 'L(p)', xlab = 'p')
+```
+
+
+3. Calculate the negative log-likelihood<br><br>
+$-\ell(p; n, y) = -[ln\big(\frac{n!}{y!(n-y)!}\big) + yln(p)$<br>
+     $$+ (n-y)ln(1-p)]$$
+
+$-ln\big[L(p; n = 100, y = 30)\big]$
+```{r, eval=TRUE, out.width = '80%', echo = FALSE}
+curve(-log(dbinom(30,100,x)),0,0.75, ylab = 'l(p)', xlab = 'p')
+```
+
+4. Calculate the derivative w.r.t. $p$<br><br>
+$\frac{d(\ell(p; n, y))}{dp} = \frac{y}{p}- \frac{n-y}{1-p}$
+
+
+
+$-ln\big[L(p; n = 100, y = 30)\big]$
+```{r, eval=TRUE, out.width = '80%', echo = FALSE}
+curve(-log(dbinom(30,100,x)),0,0.75, ylab = 'l(p)', xlab = 'p')
+```
+
+5. Set to 0 and solve for MLE<br>
+$0 = \frac{y}{p}- \frac{n-y}{1-p}$ <br>
+$E[p] = \frac{y}{n}$<br>
+$E[y] = np$
+
+
+$-ln\big[L(p; N = 100, y = 30)\big]$
+```{r, eval=TRUE, out.width = '70%', echo = FALSE}
+curve(-log(dbinom(30,100,x)),0,0.75, ylab = 'l(p)', xlab = 'p')
+nll <- -dbinom(30,100,.3,TRUE)
+segments(0.1, nll, 0.5, nll, col='red', lwd=2)
+```
+<br>
+$\hat{p} = \frac{30}{100} = 0.3$
+
+
+6. Approximate Var[p] using the second derivative<br>
+$-\frac{y}{p^2} - \frac{(n-y)}{(1-p)^2}$<br>
+$-\frac{np}{p^2} - \frac{(n-np)}{(1-p)^2}$<br>
+$-\frac{n}{p} - \frac{n(1-p)}{1-p}$<br>
+$l''(p) = -\frac{n(1-p)}{p}$<br>
+$Var[p] = \frac{p}{n(1-p)}$
+
+
+$Var[p] \approx -\frac{1}{l''(p)}$<br>
+$SE[p] \approx \sqrt{ \frac{.3}{100(.7)}} \approx 0.065$<br>
+```{r, eval=TRUE, out.width = '70%', echo = FALSE}
+curve(-log(dbinom(30,100,x)),0,0.75, ylab = 'l(p)', xlab = 'p')
+nll <- -dbinom(30,100,.3,TRUE)
+points(0.3, nll, col = 'red')
+confint <- .3 + c(-1,1)*2*sqrt(.3/70)
+segments(confint[1], -log(dbinom(30,100,confint[1])), confint[1], 100, col='red', lwd=2)
+segments(confint[2], -log(dbinom(30,100,confint[2])), confint[2], 100, col='red', lwd=2)
+text(.3, 20, "95% confint", col='red', cex = 2)
+```
+
+# Multivariate asymptotics
+
+* For N-d models, the curvature is represented by a NxN **Hessian** matrix of 2nd partial derivatives
+* Inverting the negative Hessian gives us a covariance matrix
+
+\begin{align}
+(\mathbb{H}_{f})_{i,j} &= \frac{\partial^2f}{\partial \theta_{i}, \partial x\theta_{j}} = \frac{-1}{Var(\Theta)}
+\end{align}
+
+```{r mvnorm, context="render", echo=FALSE, warning = FALSE, message=FALSE}
+
+  library(shiny)
+  cor2cov <- function(R,sd2){
+    S <- c(sd2, sd2)
+    diag(S) %*% R %*% diag(S)
+  }
+  
+  shiny::sliderInput("var", "Variance:", min = 0.1, max = 5, value = 1)
+
+  
+  shiny::renderPlot({
+    C <- cbind(c(1, .4), c(.4, 1))
+    Sigma <- cor2cov(C, input$var)
+    x <- seq(-3, 3,  .5)
+    y <- x
+    z <- matrix(0,length(x),length(y))
+    for(i in 1:length(x)){
+      for(j in 1:length(y)){
+        z[i,j] <- dmvnorm(c(x[i],y[j]), sigma = Sigma)
+      }
+    }
+  persp(x, y, -log(z), zlim = range(0,12))
+  })
+ 
+  # df <- as.data.frame(expand.grid(x = seq(-3,3,.5), y = seq(-3,3,.5)))
+  # df$z <- 0
+  # for(i in 1:nrow(df)){
+  #   df$z[i] <-   dmvnorm(c(df$x[i], df$y[i]), sigma = Sigma)
+  # }
+  # df$z = apply(df, 1, function(t) dmvnorm(c(t[1], t[2]), sigma = Sigma))
+  # for(i in 1:length(x.seq)){
+  #     df[i,] <- dmvnorm(c(x.seq[i],y.seq[j]), sigma = Sigma)
+  #   }
+  # # }
+  # ggplot(df, aes(x=x, y=x, z=z)) + 
+  #   theme_void() + 
+  #   gg3D::axes_3D()+
+  # stat_wireframe(alpha=.5) +
+  # stat_3D(aes(color=z), alpha=.5) +
+  # theme_void() +
+  # theme(legend.position = "none") +
+  # scale_color_gradientn(colors=plot3D::jet2.col()) +
+  # labs_3D(hjust=c(0,1,1), vjust=c(1, 1, -0.2), angle=c(0, 0, 90))
+  
+ # plot.ly(x=df$x, y =)
+ 
+ # print(round(-solve(Sigma),3))
+
+```
+
+

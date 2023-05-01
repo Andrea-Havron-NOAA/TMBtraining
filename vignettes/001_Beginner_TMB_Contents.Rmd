@@ -1,0 +1,12 @@
+---
+title: "Beginner TMB Presentations"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Use the following guides to set-up and start using TMB:
+
+[Statistical Computing Review](https://andrea-havron-noaa.github.io/TMBtraining/Presentations/00_00_Statistical_Computing_Review.html)

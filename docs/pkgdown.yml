@@ -1,9 +1,13 @@
-pandoc: 2.7.3
+pandoc: 2.19.2
 pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
-  samplevignette: samplevignette.html
-last_built: 2022-12-30T18:54Z
+  000_Getting_Started_Contents: 000_Getting_Started_Contents.html
+  001_Beginner_TMB_Contents: 001_Beginner_TMB_Contents.html
+  00_00_TMB_Developer_Resources: 00_00_TMB_Developer_Resources.html
+  00_01_Getting_Started: 00_01_Getting_Started.html
+  01_02_Likelihood_Review: 01_02_Likelihood_Review.html
+last_built: 2023-05-01T16:20Z
 urls:
   reference: https://nmfs-fish-tools.github.io/pkgdownTemplate/reference
   article: https://nmfs-fish-tools.github.io/pkgdownTemplate/articles
