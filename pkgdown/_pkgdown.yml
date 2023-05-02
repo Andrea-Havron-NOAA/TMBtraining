@@ -41,8 +41,8 @@ navbar:
       text: References
       icon: fas fa-book fa-lg
       menu:
-      - text: Scoping Document
-        href: Scoping.pdf
+      - text: Statistical Computing Review
+        href: Beginner_TMB/00_00_Statistical_Computing_Review.html
       - text: Background Page
         href: Article.html
 
