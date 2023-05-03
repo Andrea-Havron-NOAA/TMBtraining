@@ -39,8 +39,9 @@ code.r{
 options(htmltools.dir.version = FALSE)
 library(mvtnorm)
 library(plotly)
-#remotes::install_github("AckerDWM/gg3D")
-library(gg3D)
+library(ggplot2)
+library(knitr)
+library(kableExtra)
 
 ```
 
@@ -50,21 +51,13 @@ xaringanExtra::use_tile_view()
 ```
 ---
 # Statistical Computing Review
-<br>
-.pull-left[
-```{r, echo = FALSE, out.width="60%", fig.align="left"}
-knitr::include_graphics("static/TMB-trifecta.png")
+
+```{r, echo = FALSE, out.width="65%", fig.align="center"}
+knitr::include_graphics("static/MLE_triangle.png")
 ```
-]
 
 ---
-
-class: middle
-
-### Review:
-
----
-# ML Inference
+# Maximum Likelihood Inference
 
 #### What is the likelihood of getting 30 heads in 100 coin flips?
 
@@ -73,14 +66,16 @@ class: middle
 $y ~ \sim Binomial(n, p)$
 ]
 ---
-# ML Inference
+# Maximum Likelihood Inference
 
 #### What is the likelihood of getting 30 heads in 100 coin flips?
 
 .pull-left[
 1. Specify the model
 2. **Calculate the likelihood**<br><br>
-$L(p; n, y) = \frac{n!}{y!(n-y)!}p^y(1-p)^{n-y}$
+\begin{align}
+L(p; n, y) &= \frac{n!}{y!(n-y)!}p^y(1-p)^{n-y}
+\end{align}
 ]
 
 .pull-right[
@@ -95,16 +90,19 @@ plotly::plot_ly(df, x=~p, y=~y, type = "scatter", mode = 'lines',
 ]
 ---
 
-# ML Inference
+# Maximum Likelihood Inference
 
-**What is the likelihood of getting 30 heads in 100 coin flips?**
+#### What is the likelihood of getting 30 heads in 100 coin flips?
 
 .pull-left[
 1. Specify the model
 2. Calculate the likelihood
-3. **Calculate the negative log-likelihood**<br><br>
-$-\ell(p; n, y) = -[ln\big(\frac{n!}{y!(n-y)!}\big) + yln(p)$<br>
-     $$+ (n-y)ln(1-p)]$$
+3. **Calculate the negative log-likelihood**
+
+\begin{align}
+-\ell(p; n, y) = &-[ln\big(\frac{n!}{y!(n-y)!}\big) + yln(p)\\
+&+ (n-y)ln(1-p)]
+\end{align}
 ]
 
 .pull-right[
@@ -119,93 +117,126 @@ plotly::plot_ly(df, x=~p, y=~nll, type = "scatter", mode = 'lines',
 ]
 ---
 
-# ML Inference
+# Maximum Likelihood Inference
 
-What is the likelihood of getting 30 heads in 100 coin flips?
-
-.pull-left[
-1. Specify the model
-2. Calculate the likelihood
-3. Calculate the negative log-likelihood
-$-\ell(p; n, y) = -[ln\big(\frac{n!}{y!(n-y)!}\big) + yln(p)$<br>
-     $$+ (n-y)ln(1-p)]$$
-4. **Calculate the derivative w.r.t. $p$**<br><br>
-$\frac{d(\ell(p; n, y))}{dp} = \frac{y}{p}- \frac{n-y}{1-p}$
-]
-
-.pull-right[
-$-ln\big[L(p; n = 100, y = 30)\big]$
-```{r, eval=TRUE, out.width = '80%', echo = FALSE}
-curve(-log(dbinom(30,100,x)),0,0.75, ylab = 'l(p)', xlab = 'p')
-```
-]
----
-
-# ML Inference
-
-What is the likelihood of getting 30 heads in 100 coin flips?
+#### What is the likelihood of getting 30 heads in 100 coin flips?
 
 .pull-left[
 1. Specify the model
 2. Calculate the likelihood
 3. Calculate the negative log-likelihood
-4. Calculate the derivate wrt p
-5. **Set to 0 and solve for MLE**<br>
-$0 = \frac{y}{p}- \frac{n-y}{1-p}$ <br>
-$E[p] = \frac{y}{n}$<br>
-$E[y] = np$
+\begin{align}
+-\ell(p; n, y) = &-[ln\big(\frac{n!}{y!(n-y)!}\big) + yln(p)\\
+&+ (n-y)ln(1-p)]
+\end{align}
+
+4. **Calculate the derivative w.r.t. $p$**
+\begin{align}
+\frac{d(\ell(p; n, y))}{dp} &= \frac{y}{p}- \frac{n-y}{1-p}
+\end{align}
 ]
 
 .pull-right[
-$-ln\big[L(p; N = 100, y = 30)\big]$
-```{r, eval=TRUE, out.width = '70%', echo = FALSE}
-curve(-log(dbinom(30,100,x)),0,0.75, ylab = 'l(p)', xlab = 'p')
-nll <- -dbinom(30,100,.3,TRUE)
-segments(0.1, nll, 0.5, nll, col='red', lwd=2)
+$nll = -log(dbinom(x = 30, n = 100, p))$
+```{r, eval=TRUE, out.width = '100%', echo = FALSE}
+plotly::plot_ly(df, x=~p, y=~nll, type = "scatter", mode = 'lines',
+                width = 450, height = 375)
 ```
-<br>
-$\hat{p} = \frac{30}{100} = 0.3$
 ]
-
 ---
 
-# ML Inference
+# Maximum Likelihood Inference
 
-What is the likelihood of getting 30 heads in 100 coin flips?
+#### What is the likelihood of getting 30 heads in 100 coin flips?
 
 .pull-left[
 1. Specify the model
 2. Calculate the likelihood
 3. Calculate the negative log-likelihood
 4. Calculate the derivate wrt p
-5. Set to 0 and solve for MLE<br>
-$0 = \frac{y}{p}- \frac{n-y}{1-p}$ <br>
-$E[y] = np$
-6. **Approximate Var[p] using the second derivative**<br>
-$-\frac{y}{p^2} - \frac{(n-y)}{(1-p)^2}$<br>
-$-\frac{np}{p^2} - \frac{(n-np)}{(1-p)^2}$<br>
-$-\frac{n}{p} - \frac{n(1-p)}{1-p}$<br>
-$l''(p) = -\frac{n(1-p)}{p}$<br>
-$Var[p] = \frac{p}{n(1-p)}$
+5. **Set to $0$ and solve for MLE**<br>
+
+\begin{align}
+0 &= \frac{y}{p}- \frac{n-y}{1-p} \\
+E[p] &= \frac{y}{n} \\
+E[y] &= np
+\end{align}
+
 ]
 
 .pull-right[
-$Var[p] \approx -\frac{1}{l''(p)}$<br>
-$SE[p] \approx \sqrt{ \frac{.3}{100(.7)}} \approx 0.065$<br>
-```{r, eval=TRUE, out.width = '70%', echo = FALSE}
-curve(-log(dbinom(30,100,x)),0,0.75, ylab = 'l(p)', xlab = 'p')
-nll <- -dbinom(30,100,.3,TRUE)
-points(0.3, nll, col = 'red')
-confint <- .3 + c(-1,1)*2*sqrt(.3/70)
-segments(confint[1], -log(dbinom(30,100,confint[1])), confint[1], 100, col='red', lwd=2)
-segments(confint[2], -log(dbinom(30,100,confint[2])), confint[2], 100, col='red', lwd=2)
-text(.3, 20, "95% confint", col='red', cex = 2)
+$nll = -log(dbinom(x = 30, n = 100, p))$
+```{r, eval=TRUE, out.width = '100%', echo = FALSE}
+plotly::plot_ly(df, x=~p, y=~nll, type = "scatter", mode = 'lines',
+                width = 450, height = 375) %>% add_lines(
+         y = c(-dbinom(30,100,.3,TRUE), -dbinom(30,100,.3,TRUE)), 
+         x = c(0.1, 0.5), 
+         line = list(color = "red"), 
+         showlegend = FALSE 
+        )
+```
+]
+
+---
+# Maximum Likelihood Inference
+
+#### What is the likelihood of getting 30 heads in 100 coin flips?
+
+.pull-left[
+1. Specify the model
+2. Calculate the likelihood
+3. Calculate the negative log-likelihood
+4. Calculate the derivate wrt p
+5. Set to $0$ and solve for MLE
+\begin{align}
+0 &= \frac{y}{p}- \frac{n-y}{1-p}, \hspace{2mm} E[y] = np \\
+\end{align}
+6. **Approximate $Var[p]$ using the second derivative**<br>
+\begin{align}
+&-\frac{y}{p^2} - \frac{(n-y)}{(1-p)^2} = -\frac{np}{p^2} - \frac{(n-np)}{(1-p)^2}\\
+ &= -\frac{n}{p} - \frac{n}{1-p}\\
+l''(p) &= -\frac{n(1-p)}{p}
+\end{align}
+]
+
+.pull-right[
+\begin{align}
+Var[p] &\approx -\frac{1}{l''(p)} \approx \frac{p(1-p)}{n}\\
+SE[p] &\approx \sqrt{ .3(.7)/100} \approx .00458
+\end{align}
+```{r, eval=TRUE, out.width = '100%', echo = FALSE, warning=FALSE, message=FALSE}
+p <- seq(0,1,.01)
+y <- round(dbinom(30,100,p),3)
+df <- data.frame(y=y, p=p)
+confint <- .3 + c(-1,1)*2*sqrt(.3*.7/100)
+confint.df <- data.frame(x=rep(confint[1], 2), 
+                         y = c(dbinom(30,100,confint[1]), 0.1))
+
+  plotly::plot_ly(x=df$p, y=df$y, 
+                  type = "scatter", mode = 'lines',
+                  width = 360, height = 300) %>%
+  plotly::add_markers(x=.3, y=dbinom(30,100,.3), 
+                      type = "scatter", 
+                      showlegend = FALSE ) %>%
+  plotly::add_segments(confint[1],0.04,
+                       confint[1], 0,
+                      line = list(color = "red"),
+                      showlegend = FALSE ) %>%
+  
+  plotly::add_segments(confint[2], 0.04,
+                       confint[2], 0, mode = 'lines',
+                      line = list(color = "red"), 
+                      showlegend = FALSE ) %>%
+    plotly::add_text(x=.31, y=.01, text = "95% \nCI",
+                      showlegend = FALSE )
+  
 ```
 ]
 ---
-#Multivariate asymptotics
+# Multivariate asymptotics
 
-* For N-d models, the curvature is represented by a NxN **Hessian** matrix of 2nd partial derivatives
+* The second derivative measures the curvature of the likelihood surface
+* For models with N parameters, the curvature is represented by an NxN **Hessian** matrix of 2nd partial derivatives
 * Inverting the negative Hessian gives us a covariance matrix
 
 .pull-left[
@@ -217,7 +248,7 @@ text(.3, 20, "95% confint", col='red', cex = 2)
 ]
 
 .pull-right[
-```{r mvnorm, echo=FALSE, warning = FALSE, message=FALSE}
+```{r mvnorm, out.width = '80%', echo=FALSE, warning = FALSE, message=FALSE}
 
   cor2cov <- function(R,sd2){
     S <- c(sd2, sd2)
@@ -226,27 +257,7 @@ text(.3, 20, "95% confint", col='red', cex = 2)
 
   C <- cbind(c(1, .4), c(.4, 1))
   Sigma <- cor2cov(C, 1)
-  # df <- as.data.frame(expand.grid(x = seq(-3,3,.5), y = seq(-3,3,.5)))
-  # df$z <- 0
-  # for(i in 1:nrow(df)){
-  #   df$z[i] <-   dmvnorm(c(df$x[i], df$y[i]), sigma = Sigma)
-  # }
-  # df$z = apply(df, 1, function(t) dmvnorm(c(t[1], t[2]), sigma = Sigma))
-  # for(i in 1:length(x.seq)){
-  #     df[i,] <- dmvnorm(c(x.seq[i],y.seq[j]), sigma = Sigma)
-  #   }
-  # # }
-  # ggplot(df, aes(x=x, y=x, z=z)) + 
-  #   theme_void() + 
-  #   gg3D::axes_3D()+
-  # stat_wireframe(alpha=.5) +
-  # stat_3D(aes(color=z), alpha=.5) +
-  # theme_void() +
-  # theme(legend.position = "none") +
-  # scale_color_gradientn(colors=plot3D::jet2.col()) +
-  # labs_3D(hjust=c(0,1,1), vjust=c(1, 1, -0.2), angle=c(0, 0, 90))
   
- # plot.ly(x=df$x, y =)
   x <- seq(-3, 3,  .5)
     y <- x
     z <- matrix(0,length(x),length(y))
@@ -256,7 +267,6 @@ text(.3, 20, "95% confint", col='red', cex = 2)
       }
     }
   persp(x, y, -log(z), zlim = range(0,12))
- # print(round(-solve(Sigma),3))
 
 ```
 ]
@@ -264,33 +274,37 @@ text(.3, 20, "95% confint", col='red', cex = 2)
 
 
 ---
+# Automatic Differentiation
+
+```{r, echo = FALSE, out.width="65%", fig.align="center"}
+knitr::include_graphics("static/AD_triangle.png")
+```
+---
 # What is AD?
+<br>
+```{r, echo = FALSE}
+table.df <- data.frame(
+  var0 = c("", "Efficiency:", "Accuracy:", "Higher order derivatives:"),
+  var1 = linebreak(c("Derivatives calculated automatically using the chain rule", 
+                           "forward mode: O(n); reverse mode: O(m)",
+                           "Machine Precision",
+                           "Easy")),
+                var2 = c("Computer program converts function into exact derivative function", 
+                         "O(2n)", 
+                         "Exact",
+                         "Difficult due to complexity"),
+                var3 = c("Approximation that relies on finite differences", 
+                         "O(n)", 
+                         "Trade-off between truncation error and round-off error",
+                         "Difficult due to error accumulation"))
+colnames(table.df) <- c("", "Automatic Differentiation", 
+                        "Symbolic Differentiation",
+                        "Numerical Differentiation")
 
-.three-column-left[
-**Automatic Differentiation**<br>
-Derivatives calculated automatically using the chain rule<br>
-.p[
-- Efficient: forward mode, O(n); reverse mode, O(m)
-- Accurate 
-- Higher order derivatives: easy
-]]
-.three-column-left[
-**Symbolic Differentiation**<br>
-Computer program converts function into exact derivative function<br>
-.p[
-- Inefficient: O(2n) for n input variables
-- Exact 
-- Higher order derivatives: difficult due to complexity
-]]
-.three-column-left[
-**Numerical Differentiation**<br>
-Approximation that relies on finite differences
-.p[
-- Efficient: O(n) 
-- Trade-off between truncation error versus round-off error
-- Higher order derivatives calculation difficult due to error accumulation
-]]
-
+kbl(table.df) 
+```
+*O(n): Order of operations is based on the number of parameters <br>
+*O(m): Order of operations is based on the number of outputs, in MLE inference, this is the nll
 ---
 # Computational Graph (Tape)
 <br>
@@ -344,12 +358,31 @@ The graph is defined as forward computation is executed at every iteration
 
 ---
 
-class: middle
+# TMB AD Systems
+<br>
+.pull-left[
+**CppAD**
+- [CppAD package](https://coin-or.github.io/CppAD/doc/cppad.htm)
+]
+.pull-right[
+**TMBad**<br>
+- TMBad is available with TMB 1.8.0 and higher
+]
+---
+# R and C++ Type Systems
 
-# Type Systems in R and C++
+```{r, echo = FALSE, out.width="65%", fig.align="center"}
+knitr::include_graphics("static/Type_Triangle.png")
+```
 ---
 # Dynamic vs. Static Typing
 <br>
+.bluebox[
+**Type System** <br>
+A logical system comprising a set of rules that assigns a property called a type (for example, integer, floating point, string) to every "term" (a word, phrase, or other set of symbols) <br>
+Source: [Wikipedia](https://en.wikipedia.org/wiki/Type_system)
+]
+
 .pull-left[
 **R: Dynamic**
 .p[
@@ -365,11 +398,55 @@ class: middle
 - The values associated with a given name can be limited to just a few types and may be unchangeable
 - Change in type tends to be explicit
 ]]
+---
+# Dynamic vs. Static Typing
+<br>
+.pull-left[
+**R: Dynamic**
+- Flexible 
+- Easy to debug at runtime
+- Code is easier to read and write
+- More errors detected later in development
+- More tests are needed to detect errors
+- Slower to run
+
+```{r, echo = FALSE}
+foo <- `+`
+```
+
+```{r}
+`+`  <- `-`
+1 + 1
+```
+
+```{r, echo = FALSE}
+`+` <- foo
+rm(foo)
+```
+]
+
+.pull-right[
+**C++: Static**
+- Errors detected early in development
+- Fewer errors occur at runtime
+- Optimized code runs faster
+- Code is harder to read and write
+- Difficult to debug
+<br><br>
+```{r, echo = FALSE, out.width="65%", fig.align="center"}
+knitr::include_graphics("static/RStudioBomb.png")
+```
+
+]
+
+
 
 
 ---
-# What is Templated C++?
-<br><br>
+# What is the Template in TMB?
+<br>
+**Templated C++**
+<br>
 * Generic programming
 * Allows developer to write functions and classes that are independent of Type
 * Templates are expanded at compile time
@@ -377,8 +454,8 @@ class: middle
 .pull-left[
 ```{Rcpp, eval = FALSE}
 
-template <class T>
-  T add(T x, T y){
+template <class Type>
+  Type add(Type x, Type y){
   return x + y;
 }
 
@@ -404,16 +481,4 @@ double add(double x, double y){
 ```
 ]
 
----
-
-# TMB AD Systems
-<br>
-.pull-left[
-**CppAD**
-- [CppAD package](https://coin-or.github.io/CppAD/doc/cppad.htm)
-]
-.pull-right[
-**TMBad**<br>
-- TMBad is available with TMB 1.8.0 and higher
-]
 

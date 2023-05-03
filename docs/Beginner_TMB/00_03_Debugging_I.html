@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang xml:lang>
   <head>
-    <title>TMB Checking Output and Validation</title>
+    <title>TMB Debugging</title>
     <meta charset="utf-8" />
-    <meta name="author" content="Andrea Havron NOAA Fisheries, OST  2022-03-23" />
+    <meta name="author" content="Andrea Havron NOAA Fisheries, OST" />
     <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
 document.addEventListener('DOMContentLoaded', function(e) {
@@ -303,9 +303,8 @@ src: url(data:font/ttf;base64,AAEAAAAPAIAAAwBwR0RFRgARAMMAAAEMAAAAFkdQT1PCJYb4AA
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# TMB Checking Output and Validation
-## FIMS Implementation Team Workshop
-### Andrea Havron<br>NOAA Fisheries, OST<br> 2022-03-23
+# TMB Debugging
+### Andrea Havron<br>NOAA Fisheries, OST
 
 ---
 
@@ -557,9 +556,10 @@ opt &lt;- nlminb(obj$par, obj$fn, obj$gr)
 ]
 
 **Non-Invertible Hessians**
-* The Hessian will **not be invertible** if the MLE is not a true minimum
-* When could this occur? Usually mis-specified models
-* Parameters confounded or overparameterized (too complex for data)
+* The Hessian will **not be invertible** if the MLE is not a true minimum (ie. flat likelihood surface)
+* When could this occur? 
+  * Usually mis-specified models
+  * Parameters confounded or overparameterized (too complex for data)
 * TMB will warn about uninvertible Hessians (NaNs)
 
 ---

@@ -272,7 +272,7 @@ linReg.cpp
 Set-up Model in R
 ```{r}
 library(TMB)
-dyn.load(dynlib('../src/linReg'))
+dyn.load(dynlib('lecture_code/linReg'))
 sig <- 2
 beta <- c(0.5,2)
 

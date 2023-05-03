@@ -1,6 +1,5 @@
 ---
-title:  "TMB Basics"
-subtitle: "TMB Training Session I"
+title:  "TMB Preliminaries"
 author: "Andrea Havron<br>NOAA Fisheries, OST"
 output:
   xaringan::moon_reader:
@@ -49,25 +48,6 @@ xaringanExtra::use_tile_view()
 
 ---
 
-# ML with TMB:
-<br><br>
-1. Write C++ model to specify the negative log-likelihood for a set of parameters and data
-2. Compile the model and link to R
-3. Construct the computational graph (tape)
-3. Pass the following to a R minimizer:
- * objective function: specified by user in C++
- * initial parameters and data: specified by user in R
- * gradient functions: calculated by TMB based on objective function
-4. At each step of minimization:
- * Parameter values are updated
- * The negative log-likelihood is calculated
- * The gradient functions return the gradients (vector of 1st derivatives) based on the new parameter values
-5. Model convergence is reached when:
- * The gradients are near zero
- * The negative log-likelihood is at a minimum
-
----
-
 # TMB Model
 
 
@@ -104,14 +84,14 @@ Type objective_function<Type>::operator()()
 ]
 
 .pull-right[
-**C++ preliminaries**
+**C++ Syntax**
 * Lines end in semi-colons
 * Everything must be declared
 * Type is generic and assigned based on input
-* Indexing starts at 0!
-* x -= 1: x = x-1
-* Math operators similar to R (+,-,/,*) 
-* Use pow(x,p) for x^p
+* Indexing starts at $0$!
+* $x -= 1: x = x-1$
+* Math operators similar to R $(+ - /*)$ 
+* Use $pow(x,p)$ for $x^p$
 * if statements cannot be based on a parameter
 ]
 
